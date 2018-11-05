@@ -1,0 +1,320 @@
+import pandas as pd
+import numpy as np
+import statistics 
+import matplotlib.pyplot as plt     #Take care of any imports that will be needed
+import plotly as py
+import plotly.graph_objs as go
+
+py.offline.init_notebook_mode(connected = True)
+
+file = pd.read_csv('userssharedsdfschoolimprovement2010grants.csv')  #Read in the file containing the schools data
+
+x1 = file[file['Model Selected'] == "Transformation"]  #Initially separate the data by model type selected
+
+x1_numeric = pd.to_numeric(x1['2010/11/Award Amount'].str.replace('$',''))  #Switch the award amounts column to a numeric for each model selected so that calculations can be performed on it
+
+Transform_mean = np.mean(x1_numeric)                                        #Taking the mean and standard deviation of each model type
+
+Transform_Deviation = np.std(x1_numeric)
+
+print("Transformation max is " , x1_numeric.max())
+
+print("Transformation min is " , x1_numeric.min())
+
+x2 = file[file['Model Selected'] == "Restart"]
+
+x2_numeric = pd.to_numeric(x2['2010/11/Award Amount'].str.replace('$',''))
+
+Restart_mean = np.mean(x2_numeric)
+
+Restart_Deviation = np.std(x2_numeric)
+
+print("Restart max is " , x2_numeric.max())
+
+print("Restart min is " , x2_numeric.min())
+
+x3 = file[file['Model Selected'] == "Closure"]
+
+x3_numeric = pd.to_numeric(x3['2010/11/Award Amount'].str.replace('$',''))
+
+Closure_mean = np.mean(x3_numeric)
+
+Closure_Deviation = np.std(x3_numeric)
+
+print("Closure max is " , x3_numeric.max())
+
+print("Closure min is " , x3_numeric.min())
+
+x4 = file[file['Model Selected'] == "Turnaround"]
+
+x4_numeric = pd.to_numeric(x4['2010/11/Award Amount'].str.replace('$',''))
+
+Turnaround_mean = np.mean(x4_numeric)
+
+Turnaround_Deviation = np.std(x4_numeric)
+
+print("Turnaround max is " , x4_numeric.max())
+
+print("Turnaround min is " , x4_numeric.min())
+
+mean_fundings = [Transform_mean, Restart_mean, Closure_mean, Turnaround_mean]
+
+Deviation_fundings = [Transform_Deviation, Restart_Deviation, Closure_Deviation, Turnaround_Deviation]
+
+Labels = ["Transform Model", "Restart Model", "Closure Model", "Turnaround Model"]
+
+x = Labels
+
+y = mean_fundings
+
+y2 = Deviation_fundings
+
+layout = go.Layout(                    #Plotting a bar chart for the mean and standard deviation of each model type
+    title='Mean Funding By Model',
+    yaxis= dict(
+        title='Mean Award Amount'
+    ),
+    xaxis= dict(
+        title='Model Selected'
+    )
+)
+
+trace1 = go.Bar(
+    x = x,
+    y = y,
+    name = 'Mean Funding'
+    )
+
+trace_Dev = go.Bar(
+    x = x,
+    y = y2,
+    name = 'Standard Deviation'
+    )
+
+fig = go.Figure(data = [trace1 , trace_Dev], layout = layout)
+py.offline.iplot(fig)
+
+length_transform = len(x1)   #Finding the frequency (number of schools) for each model type
+
+length_restart = len(x2)
+
+length_closure = len(x3)
+
+length_turnaround = len(x4)
+
+Model_Frequencies = [length_transform, length_restart, length_closure, length_turnaround]
+
+layout2 = go.Layout(                         #Plotting a bar chart for the frequency of each model type
+    title='Frequency of Models',
+    yaxis= dict(
+        title='Model Frequency'
+    ),
+    xaxis= dict(
+        title='Model Type'
+    )
+)
+
+trace2 = go.Bar(
+    x = x,
+    y = Model_Frequencies,
+    name = 'plot'
+    )
+
+fig2 = go.Figure(data = [trace2], layout = layout2)
+py.offline.iplot(fig2)
+
+file_numeric = pd.to_numeric(file['2010/11/Award Amount'].str.replace('$',''))
+
+file_numeric.hist()
+plt.title('Histogram for Award Amounts Nationally')     #Plotting a histogram to evaluate the award amounts nationally
+plt.xlabel('Award Amounts')
+plt.ylabel('Counts')
+
+
+#Splitting the states into region so that the data can be analyzed by region of the country
+
+Northeast_Region = file[file['State'].isin(["ME","NH","VT","MA","CT","NJ","RI","NY","PA","DE","MD","DC"])]
+
+South_Region = file[file['State'].isin(["VA","WV","NC","SC","KY","TN","AL","GA","MS","FL","LA","AR"])]
+
+Midwest_Region = file[file['State'].isin(["OH","MI","IN","IL","WI","MN","IA","MO","KS","NE","SD","ND"])]
+
+Northwest_Region = file[file['State'].isin(["WY","MT","OR","ID","WA","CO","UT","AK"])]
+
+Southwest_Region = file[file['State'].isin(["CA","NV","TX","AZ","NM","OK","HI"])]
+
+Northeast_Mean = np.mean(pd.to_numeric(Northeast_Region['2010/11/Award Amount'].str.replace('$','')))
+
+print("Northeast Mean is " , Northeast_Mean)  #Finding the mean funding amount of each region
+
+South_Mean = np.mean(pd.to_numeric(South_Region['2010/11/Award Amount'].str.replace('$','')))
+
+print("South Mean is " , South_Mean)
+
+Midwest_Mean = np.mean(pd.to_numeric(Midwest_Region['2010/11/Award Amount'].str.replace('$','')))
+
+print("Midwest Mean is " , Midwest_Mean)
+
+Northwest_Mean = np.mean(pd.to_numeric(Northwest_Region['2010/11/Award Amount'].str.replace('$','')))
+
+print("Northwest Mean is " , Northwest_Mean)
+
+Southwest_Mean = np.mean(pd.to_numeric(Southwest_Region['2010/11/Award Amount'].str.replace('$','')))
+
+print("Southwest Mean is " , Southwest_Mean)
+
+Northeast_Dev = np.std(pd.to_numeric(Northeast_Region['2010/11/Award Amount'].str.replace('$',''))) #Finding the standard deviation of funding amounts of each region
+
+South_Dev = np.std(pd.to_numeric(South_Region['2010/11/Award Amount'].str.replace('$','')))
+
+Midwest_Dev = np.std(pd.to_numeric(Midwest_Region['2010/11/Award Amount'].str.replace('$','')))
+
+Northwest_Dev = np.std(pd.to_numeric(Northwest_Region['2010/11/Award Amount'].str.replace('$','')))
+
+Southwest_Dev = np.std(pd.to_numeric(Southwest_Region['2010/11/Award Amount'].str.replace('$','')))
+
+x_Reg = ["Northeast" , "South" , "Midwest" , "Northwest" , "Southwest"]
+
+y_Reg = [Northeast_Mean , South_Mean , Midwest_Mean , Northwest_Mean , Southwest_Mean]
+
+y_Reg2 = [Northeast_Dev , South_Dev , Midwest_Dev , Northwest_Dev , Southwest_Dev]
+
+layout_Reg = go.Layout(
+    title='Mean Funding By Region',            #Ploting a bar chart of the mean and standard deviation of each region
+    yaxis= dict(
+        title='Mean Award Amount'
+    ),
+    xaxis= dict(
+        title='Region'
+    )
+)
+
+trace_Reg = go.Bar(
+    x = x_Reg,
+    y = y_Reg,
+    name = 'Mean Funding'
+    )
+
+trace_Reg2 = go.Bar(
+    x = x_Reg,
+    y = y_Reg2,
+    name = 'Standard Deviation'
+    )
+
+fig_region = go.Figure(data = [trace_Reg , trace_Reg2], layout = layout_Reg)
+py.offline.iplot(fig_region)
+
+length_Northeast = len(Northeast_Region)   #Finding the number of schools in each region
+  
+length_South = len(South_Region)
+
+length_Midwest = len(Midwest_Region)
+
+length_Northwest = len(Northwest_Region)
+
+length_Southwest = len(Southwest_Region)
+
+Regional_Frequencies = [length_Northeast, length_South, length_Midwest, length_Northwest , length_Southwest]
+
+layout_Freq = go.Layout(                        #Plotting a bar chart of the number of schools in each region
+    title='Number of Schools By Region',
+    yaxis= dict(
+        title='Number of Schools'
+    ),
+    xaxis= dict(
+        title='Region'
+    )
+)
+
+trace_Freq = go.Bar(
+    x = x_Reg,
+    y = Regional_Frequencies,
+    name = 'plot'
+    )
+
+fig_region_frequencies = go.Figure(data = [trace_Freq], layout = layout_Freq)
+py.offline.iplot(fig_region_frequencies)
+
+#Creating a new column containing regions so that it can be used in the scattergeo plot later
+
+file['Region'] = np.where(file['State'].isin(["ME","NH","VT","MA","CT","NJ","RI","NY","PA","DE","MD","DC"]), 'Northeast', 
+                          np.where(file['State'].isin(["VA","WV","NC","SC","KY","TN","AL","GA","MS","FL","LA","AR"]) , 'South' , 
+                                   np.where(file['State'].isin(["OH","MI","IN","IL","WI","MN","IA","MO","KS","NE","SD","ND"]) , 'Midwest' , 
+                                            np.where(file['State'].isin(["WY","MT","OR","ID","WA","CO","UT","AK"]) , 'Northwest' , 
+                                                     np.where(file['State'].isin(["CA","NV","TX","AZ","NM","OK","HI"]) , 'Southwest', 'No Match')))))
+
+print(file['Region'].value_counts())
+
+
+null_values = file[pd.isnull(file).any(axis=1)]  #Looking into missing or null values by different subsets of the data
+
+print(null_values['State'].value_counts())
+
+print(file['State'].value_counts())
+
+print(null_values['Model Selected'].value_counts())
+
+print(file['Model Selected'].value_counts())
+
+print(file[file["2010/11/Award Amount"].str.replace("$", "").astype(float) < 5.0])   #Looking into outliers in the data
+
+print((file["2010/11/Award Amount"].str.replace("$", "").astype(float) < 5.0).value_counts())
+
+print(file[file["2010/11/Award Amount"].str.replace("$", "").astype(float) > 750000.0])
+
+print((file["2010/11/Award Amount"].str.replace("$", "").astype(float) > 750000.0).value_counts())
+
+
+#Creating columns for the longitude and lattitude so that it can be used for the scattergeo plot later
+
+file["Latitude"]  = file.Location.str.split("\n").apply(pd.Series)[2].str.replace("(", "").str.replace(")", "").str.split(",").apply(pd.Series)[0].astype(float)
+file["Longitude"] = file.Location.str.split("\n").apply(pd.Series)[2].str.replace("(", "").str.replace(")", "").str.split(",").apply(pd.Series)[1].astype(float)
+
+
+scl = colorscale=[[0, 'rgb(166,206,227)'], [0.25, 'rgb(31,120,180)'],     #Creating a scattergeo plot for analysis
+                  [0.45, 'rgb(178,223,138)'], [0.65, 'rgb(51,160,44)'], 
+                  [0.85, 'rgb(251,154,153)'], [1, 'rgb(227,26,28)']]
+
+data_map = [ dict(
+        type = 'scattergeo',
+        locationmode = 'USA-states',
+        lon = file['Longitude'],
+        lat = file['Latitude'],
+        text = file['Model Selected'] + " Model / " + file['2010/11/Award Amount'] + " Funding Amount / " + 
+    file['School Name'] + " / " +  file['Region'] + " Region",
+        mode = 'markers',
+        marker = dict(
+            size = 8,
+            opacity = 0.8,
+            reversescale = True,
+            autocolorscale = False,
+            symbol = 'square',
+            line = dict(
+                width=1,
+                color='rgba(102, 102, 102)'
+            ),
+            colorscale = scl,
+            cmin = 0,
+            color = file["2010/11/Award Amount"].str.replace("$", "").astype(float),
+            cmax = (file["2010/11/Award Amount"].str.replace("$", "").astype(float)).max(),
+            colorbar=dict(
+                title="Funding Amounts"
+            )
+        ))]
+
+layout_map = dict(
+        title = 'Funding Amounts by Location and Model Type',
+        geo = dict(
+            scope='usa',
+            projection=dict( type='albers usa' ),
+            showland = True,
+            landcolor = "rgb(250, 250, 250)",
+            subunitcolor = "rgb(217, 217, 217)",
+            countrycolor = "rgb(217, 217, 217)",
+            countrywidth = 0.75,
+            subunitwidth = 0.75
+        ),
+    )
+
+fig_map = dict( data=data_map, layout=layout_map )
+py.offline.iplot(fig_map)
